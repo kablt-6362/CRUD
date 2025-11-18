@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>DETAIL</title>
+</head>
+<body>
+    <h1>DETAIL</h1>
+    <a href="/todos">home</a>
+<!--  private여서 접근이 불가능 하다.  -->
+<!--  아래는 직접 접근한게 아니라 thymeleaf의 기능으로 아래처럼 써도
+       getId(),getTitle()로 접근해서 값을 넣어준다-->
+    <h2 th:text="${todo.title}"></h2>
+    <h4 th:text="${todo.content}"></h4>
+    <p th:text="${todo.isCompleted()? '완료': '미완료'}"></p>
+</body>
+</html>
