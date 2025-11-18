@@ -61,4 +61,37 @@ public class todoController {
         model.addAttribute("todo",todo);
         return "detail";
     }
+
+    @GetMapping("/todos/{id}/delete")
+    public String delete(@PathVariable Long id,Model model){
+        todoRepository.deleteById(id);
+        return "redirect:/todos";
+    }
+
+    @GetMapping("/todos/{id}/edit")
+    public String edit(@PathVariable Long id,Model model){
+        TodoDto todo = todoRepository.findById(id);
+        model.addAttribute("todo",todo);
+        return "edit";
+    }
+
+    @GetMapping("/todos/{id}/update")
+    public String update(@PathVariable Long id
+            ,Model model
+            ,@RequestParam String title
+            ,@RequestParam String content
+            ,@RequestParam(defaultValue = (String)"false") Boolean completed)
+            //input의 checkbox 속성은 체크를 안할시 아무것도 반화하지 않기에
+            //이 매서드의 requestParam의 중 completed가 받을 값이 없어서 문제가 생김
+            //defaultValue를 사용하여 반환값이 없을시 false로 반환하도록 지정
+    {
+        TodoDto todo = todoRepository.findById(id);
+
+        todo.setTitle(title);
+        todo.setContent(content);
+        todo.setCompleted(completed);
+        todoRepository.save(todo);
+        return "redirect:/todos/"+id;
+    }
+
 }
