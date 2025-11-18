@@ -8,4 +8,9 @@ public class TodoRepository {
     private final Map<Long, TodoDto> storage = new ConcurrentHashMap<>();// Map의 구조 [{key : value},...]
     private Long nextId = 1L ;
 
+    public TodoDto save(TodoDto todo){
+        todo.setId(nextId++);
+        storage.put(todo.getId(),todo);
+        return todo;
+    }
 }
