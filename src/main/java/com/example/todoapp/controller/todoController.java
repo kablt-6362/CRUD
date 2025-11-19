@@ -114,4 +114,25 @@ public class todoController {
 
     }
 
+    @GetMapping("/todos/search")
+    public String search(@RequestParam String keyword,Model model){
+        List<TodoDto> todos = todoRepository.findByTitleContain(keyword);
+        model.addAttribute("todos",todos);
+        return "todos";
+    }
+
+    @GetMapping("/todos/active")
+    public String actice(Model model){
+        List<TodoDto> todos = todoRepository.findByCompleted(false);
+        model.addAttribute("todos",todos);
+        return "todos";
+    }
+
+    @GetMapping("/todos/completed")
+    public String completed(Model model){
+        List<TodoDto> todos = todoRepository.findByCompleted(true);
+        model.addAttribute("todos",todos);
+        return "todos";
+    }
+
 }
