@@ -71,8 +71,11 @@ public class todoController {
     }
 
     @GetMapping("/{id}/delete")
-    public String delete(@PathVariable Long id,Model model){
+    public String delete(@PathVariable Long id,Model model,
+                         RedirectAttributes redirectAttributes){
         todoRepository.deleteById(id);
+        redirectAttributes.addFlashAttribute("message","할 일이 삭제되었습니다.");
+        redirectAttributes.addFlashAttribute("status","delete");
         return "redirect:/todos";
     }
 
@@ -95,7 +98,8 @@ public class todoController {
             ,Model model
             ,@RequestParam String title
             ,@RequestParam String content
-            ,@RequestParam(defaultValue = (String)"false") Boolean completed)
+            ,@RequestParam(defaultValue = (String)"false") Boolean completed,
+                         RedirectAttributes redirectAttributes)
             //input의 checkbox 속성은 체크를 안할시 아무것도 반화하지 않기에
             //이 매서드의 requestParam의 중 completed가 받을 값이 없어서 문제가 생김
             //defaultValue를 사용하여 반환값이 없을시 false로 반환하도록 지정
@@ -107,8 +111,11 @@ public class todoController {
             todo.setContent(content);
             todo.setCompleted(completed);
             todoRepository.save(todo);
+            redirectAttributes.addFlashAttribute("message","할 일이 수정되었습니다");
+
             return "redirect:/todos/"+id;
         } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("message","없는 할 일 입니다");
             return "redirect:/todos";
         }
 
