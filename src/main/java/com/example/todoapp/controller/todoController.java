@@ -5,6 +5,7 @@ import com.example.todoapp.repository.TodoRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class todoController {
     @PostMapping()
     public String create(@RequestParam String title
             , @RequestParam String content
+            , RedirectAttributes redirectAttributes
             , Model model){
         TodoDto todoDto = new TodoDto(null,title,content,false);
         //TodoRepository todoRepository = new TodoRepository();
@@ -47,7 +49,7 @@ public class todoController {
         TodoDto todo = todoRepository.save(todoDto);
 
         model.addAttribute("todo",todo);
-
+        redirectAttributes.addFlashAttribute("message","할 일이 생성 되었습니다");
         //return "create";
         // 바로 todos로 가는 주소로 반환
         return "redirect:/todos";
