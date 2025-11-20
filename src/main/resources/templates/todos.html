@@ -5,15 +5,17 @@
 >
 
 <div layout:fragment="content">
-    <h1>할일목록</h1>
-
-    <hr>
     <!--    <h3 th:each="todo:${todos}" th:text="${todo.getTitle()}" ></h3>-->
-    <div th:each="todo:${todos}">
-        <h3 th:text="${todo.getTitle()}"></h3>
-        <a th:href="@{/todos/{id} (id= ${todo.getId()} ) }">detail</a>
-    </div>
+<!--    <div th:each="todo:${todos}">-->
+<!--        <h3 th:text="${todo.getTitle()}"></h3>-->
+<!--        <a th:href="@{/todos/{id} (id= ${todo.getId()} ) }">detail</a>-->
+<!--    </div>-->
 
+    <div class="stats">
+        <p>전체 : <span th:text="${totalConut}"></span></p>
+        <p>완료 : <span th:text="${completedCount}"></span></p>
+        <p>미완료 : <span th:text="${activeCount}"></span></p>
+    </div>
 
     <table class="table table-striped">
         <thead>
@@ -35,6 +37,13 @@
                 </td>
             </tr>
         </tbody>
-
     </table>
+<!--    <div>-->
+<!--        <span>전체수</span>-->
+<!--        <span th:text="${list[0]}"></span>-->
+<!--        <span>미완료</span>-->
+<!--        <span th:text="${list[1]}"></span>-->
+<!--        <span>완료</span>-->
+<!--        <span th:text="${list[2]}"></span>-->
+<!--    </div>-->
 </div>

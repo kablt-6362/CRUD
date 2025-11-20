@@ -27,12 +27,13 @@ public class todoController {
 
     @GetMapping
     public String todos(Model model){
-    //TodoRepository todoRepository = new TodoRepository();
-    // 이전의 만든 repository는 매서드 밖으로 꺼내와서 쓸수가없다.
-        // 위의 선언은 다른 저장소의 객체이다.그래서 최상위 매서드에 저장소 객체를 생성하여 사용한다
-//        List<TodoDto> todos = todoRepository.findAll();
         List<TodoDto> todos = todoService.getAllTodos();
         model.addAttribute("todos",todos);
+        model.addAttribute("totalConut",todoService.gettotalCount());
+        model.addAttribute("completedCount",todoService.getCompletedCount());
+        model.addAttribute("activeCount",todoService.getActiveCount());
+//        List<Integer> list = todoService.Total();
+//        model.addAttribute("list",list);
         return "todos";
     }
 
@@ -51,17 +52,15 @@ public class todoController {
             @ModelAttribute TodoDto todo
             //Model model
              ){
-        //TodoDto todoDto = new TodoDto(null,title,content,false);
-        //TodoRepository todoRepository = new TodoRepository();
 
-        //TodoDto todo = todoRepository.save(todoDto);
-        //todoRepository.save(todo);
-        todoService.createTodoDto(todo);
-        //model.addAttribute("todo",todo);
-        redirectAttributes.addFlashAttribute("message","할 일이 생성 되었습니다");
-        //return "create";
-        // 바로 todos로 가는 주소로 반환
-        return "redirect:/todos";
+        try{
+            todoService.createTodoDto(todo);
+            redirectAttributes.addFlashAttribute("message","할 일이 생성 되었습니다");
+            return "redirect:/todos";
+        }catch (IllegalArgumentException e){
+            redirectAttributes.addFlashAttribute("error",e.getMessage());
+            return "redirect:/todos/new";
+        }
     }
 
     @GetMapping("/{id}")
@@ -170,8 +169,26 @@ public class todoController {
         }catch(IllegalArgumentException e){
             return "redirect:/todos";
         }
-
-
     }
+
+    @GetMapping("/delete-completed")
+    public String deleteCompleted(RedirectAttributes redirectAttributes) {
+        // delete all
+        todoService.deleteCompletedTodos();
+        redirectAttributes.addFlashAttribute("message", "완료된 할일 삭제");
+        return "redirect:/todos";
+    }
+
+
+    //1.제목 검증 추가
+    // -제목이 비어있으면 예외처리
+    // - 제목이 50자 초과시 예외
+
+    // 2. 통계 기능 추가
+    // - 전체,완료된, 미완료 할 일 개수 => todos 에 표시
+
+    // 3. 완료된 할일 일괄 삭제
+
+
 
 }
