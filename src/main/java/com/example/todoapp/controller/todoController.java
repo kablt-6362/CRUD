@@ -115,19 +115,18 @@ public class todoController {
             //defaultValue를 사용하여 반환값이 없을시 false로 반환하도록 지정
     {
         try{
-            //TodoDto todo = todoRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("not found todo!"));
-
-//            todo.setTitle(title);
-//            todo.setContent(content);
-//            todo.setCompleted(completed);
-            //todoRepository.save(todo);
             todoService.updateTodoById(id,todo);
             redirectAttributes.addFlashAttribute("message","할 일이 수정되었습니다");
 
             return "redirect:/todos/"+id;
         } catch (IllegalArgumentException e) {
+            if(e.getMessage().contains("제목")) {
             redirectAttributes.addFlashAttribute("message","없는 할 일 입니다");
-            return "redirect:/todos";
+            return "redirect:/todos"+id+"/update";
+            }else{
+                redirectAttributes.addFlashAttribute("message", "없는 할일입니다.");
+                return "redirect:/todos";
+            }
         }
 
 
