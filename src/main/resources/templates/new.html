@@ -6,11 +6,11 @@
 
 <div layout:fragment="content">
     <h1>NEW</h1>
-    <form action="/todos" method="post">
+    <form action="/todos" method="post" th:object="${todo}">
         <label for="title">Title</label>
-        <input type="text" id="title" name="title" class="form-control">
+        <input id="title" class="form-control" th:field="*{title}">
         <label for="content">Content</label>
-        <input type="text" id="content" name="content" class="form-control">
+        <input id="content" class="form-control" th:field="*{content}">
         <input type="submit" class="btn btn-success">
     </form>
 </div>

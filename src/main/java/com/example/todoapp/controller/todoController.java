@@ -33,22 +33,26 @@ public class todoController {
     }
 
     @GetMapping("/new")
-    public String newTodo(){
-        return "new";
+    public String newTodo(Model model){
+        model.addAttribute("todo",new TodoDto());
+        return "form";
     }
 
 //    @GetMapping("/create")
     @PostMapping()
-    public String create(@RequestParam String title
-            , @RequestParam String content
-            , RedirectAttributes redirectAttributes
-            , Model model){
-        TodoDto todoDto = new TodoDto(null,title,content,false);
+    public String create(
+            //@RequestParam String title
+           // , @RequestParam String content
+             RedirectAttributes redirectAttributes,
+            @ModelAttribute TodoDto todo
+            //Model model
+             ){
+        //TodoDto todoDto = new TodoDto(null,title,content,false);
         //TodoRepository todoRepository = new TodoRepository();
 
-        TodoDto todo = todoRepository.save(todoDto);
-
-        model.addAttribute("todo",todo);
+        //TodoDto todo = todoRepository.save(todoDto);
+        todoRepository.save(todo);
+        //model.addAttribute("todo",todo);
         redirectAttributes.addFlashAttribute("message","할 일이 생성 되었습니다");
         //return "create";
         // 바로 todos로 가는 주소로 반환
@@ -84,7 +88,7 @@ public class todoController {
         try{
             TodoDto todo = todoRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("todo not Found!!!"));
             model.addAttribute("todo",todo);
-            return "update";
+            return "form";
         }catch (IllegalArgumentException e){
         return "redirect:/todos";
         }
@@ -96,20 +100,19 @@ public class todoController {
     @PostMapping("/{id}/update")
     public String update(@PathVariable Long id
             ,Model model
-            ,@RequestParam String title
-            ,@RequestParam String content
-            ,@RequestParam(defaultValue = (String)"false") Boolean completed,
-                         RedirectAttributes redirectAttributes)
+            ,RedirectAttributes redirectAttributes
+            ,@ModelAttribute TodoDto todo
+                 )
             //input의 checkbox 속성은 체크를 안할시 아무것도 반화하지 않기에
             //이 매서드의 requestParam의 중 completed가 받을 값이 없어서 문제가 생김
             //defaultValue를 사용하여 반환값이 없을시 false로 반환하도록 지정
     {
         try{
-            TodoDto todo = todoRepository.findById(id).orElseThrow();
+            //TodoDto todo = todoRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("not found todo!"));
 
-            todo.setTitle(title);
-            todo.setContent(content);
-            todo.setCompleted(completed);
+//            todo.setTitle(title);
+//            todo.setContent(content);
+//            todo.setCompleted(completed);
             todoRepository.save(todo);
             redirectAttributes.addFlashAttribute("message","할 일이 수정되었습니다");
 

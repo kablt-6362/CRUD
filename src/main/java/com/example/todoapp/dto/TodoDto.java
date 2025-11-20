@@ -13,6 +13,9 @@ public class TodoDto {
         this.completed = completed;
     }
 
+    //빈객체를 생성하기 위한 새로운 생성자
+    public TodoDto(){}
+
     public Long getId() {
         return id;
     }
