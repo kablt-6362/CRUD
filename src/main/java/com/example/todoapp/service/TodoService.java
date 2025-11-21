@@ -2,6 +2,7 @@ package com.example.todoapp.service;
 
 import com.example.todoapp.dto.TodoDto;
 import com.example.todoapp.entity.TodoEntity;
+import com.example.todoapp.exception.ResourceNotFoundException;
 import com.example.todoapp.repository.TodoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class TodoService {
     private TodoEntity findEntityById(Long id){
         return todoRepository.findById(id)
                 .orElseThrow(
-                        ()->new IllegalArgumentException("not found todo : id"+id));
+                        ()->new ResourceNotFoundException("not found todo : id"+id));
     }
 
     public TodoDto getTodoById(Long id){
@@ -70,7 +71,7 @@ public class TodoService {
 
 
     public List<TodoDto> searchTodos(String keyword){
-        return todoRepository.findByTitleContain(keyword).stream().map(this::toDto).collect(Collectors.toList());
+        return todoRepository.findByTitleContaining(keyword).stream().map(this::toDto).collect(Collectors.toList());
     }
 
     public List<TodoDto> getTodosByCompleted(Boolean completed){
@@ -83,6 +84,7 @@ public class TodoService {
         return toDto(entity);
     }
 
+    //제목검증 매서드
     private void vaildateTitle(String title){
         if(title == null || title.trim().isEmpty()){
             throw new IllegalArgumentException("제목은 필수입니다");
@@ -92,6 +94,7 @@ public class TodoService {
         }
     }
 
+    //전체,완료,미완료 수
     public long gettotalCount(){
         return todoRepository.findAll().size();
     }
@@ -102,9 +105,10 @@ public class TodoService {
         return todoRepository.findByCompleted(true).size();
     }
 
+    //완료된일 모두 삭제
     public void deleteCompletedTodos(){
 
-        todoRepository.deletedByCompleted(true);
+        todoRepository.deleteByCompleted(true);
     }
 
 //    // 제목 검증. 시도한거
