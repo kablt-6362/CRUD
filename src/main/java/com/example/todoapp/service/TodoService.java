@@ -1,13 +1,17 @@
 package com.example.todoapp.service;
 
 import com.example.todoapp.dto.TodoDto;
+import com.example.todoapp.entity.TodoEntity;
 import com.example.todoapp.repository.TodoRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional // 매서드를 하나의 일처리로 생각하고 매서드안의 내용을 transaction기능을 부여한다
 public class TodoService {
 
     private final TodoRepository todoRepository;
@@ -16,51 +20,67 @@ public class TodoService {
         this.todoRepository = todoRepository;
     }
 
-    public List<TodoDto> getAllTodos(){
-        return todoRepository.findAll();
+    public TodoDto createTodoDto(TodoDto dto){
+        vaildateTitle(dto.getTitle());
+        //저장소에 저장하기위해 TodoEntity로 객체 생성 후 dto값 생성자에 대입
+        TodoEntity entity = new TodoEntity(dto.getTitle(), dto.getContent(),dto.isCompleted());
+        // 저장소에 추가 후 TodoEntity 형태로 반환
+        TodoEntity saved = todoRepository.save(entity);
+
+
+        return toDto(saved);
     }
 
-    public TodoDto getTodoById(Long id){
+    private TodoEntity findEntityById(Long id){
         return todoRepository.findById(id)
                 .orElseThrow(
                         ()->new IllegalArgumentException("not found todo : id"+id));
     }
 
+    public TodoDto getTodoById(Long id){
+        TodoEntity entity = findEntityById(id);
+        return toDto(entity);
+    }
+
+
+    public List<TodoDto> getAllTodos(){
+        return todoRepository.findAll().stream().map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+
     public void deleteTodoById(Long id){
-        getTodoById(id);
+        //getTodoById(id);
+        findEntityById(id);
         todoRepository.deleteById(id);
     }
 
-    public TodoDto updateTodoById(Long id,TodoDto newTodo){
-        TodoDto originTodo = getTodoById(id);
+    public TodoDto updateTodoById(Long id,TodoDto dto){
+        vaildateTitle(dto.getTitle());
 
-        vaildateTitle(newTodo.getTitle());
+        TodoEntity entity = findEntityById(id);
 
-        originTodo.setTitle(newTodo.getTitle());
-        originTodo.setContent(newTodo.getContent());
-        originTodo.setCompleted(newTodo.isCompleted());
+        entity.setTitle(dto.getTitle());
+        entity.setContent(dto.getContent());
+        entity.setCompleted(dto.isCompleted());
 
-        return todoRepository.save(originTodo);
-
+        return toDto(entity);
+        //save안쓴 이유: transaction설정시 매서드 실행완료 후 자동 저장하기때문
     }
 
-    public TodoDto createTodoDto(TodoDto todo){
-        vaildateTitle(todo.getTitle());
-        return todoRepository.save(todo);
-    }
 
     public List<TodoDto> searchTodos(String keyword){
-        return todoRepository.findByTitleContain(keyword);
+        return todoRepository.findByTitleContain(keyword).stream().map(this::toDto).collect(Collectors.toList());
     }
 
     public List<TodoDto> getTodosByCompleted(Boolean completed){
-        return todoRepository.findByCompleted(completed);
+        return todoRepository.findByCompleted(completed).stream().map(this::toDto).collect(Collectors.toList());
     }
 
     public TodoDto toggleCompleted(Long id){
-        TodoDto todo = getTodoById(id);
-        todo.setCompleted(!todo.isCompleted());
-        return todoRepository.save(todo);
+        TodoEntity entity = findEntityById(id);
+        entity.setCompleted(!entity.isCompleted());
+        return toDto(entity);
     }
 
     private void vaildateTitle(String title){
@@ -84,32 +104,41 @@ public class TodoService {
 
     public void deleteCompletedTodos(){
 
-        todoRepository.deleteCompleted();
+        todoRepository.deletedByCompleted(true);
     }
 
-    // 제목 검증. 시도한거
-    public void TodoTitleCheck(Long id){
-        TodoDto todo = getTodoById(id);
-        String title = todo.getTitle();
-        if(title != null){
-            if(title.length() <= 50){
-                System.out.println("사용가능 Title");
-            }
-        }
-    }
+//    // 제목 검증. 시도한거
+//    public void TodoTitleCheck(Long id){
+//        TodoDto todo = getTodoById(id);
+//        String title = todo.getTitle();
+//        if(title != null){
+//            if(title.length() <= 50){
+//                System.out.println("사용가능 Title");
+//            }
+//        }
+//    }
+//
+//    // 통계 기능. 시도한거
+//    public List<Integer> Total(){
+//        int total = todoRepository.findAll().size();
+//        int active = todoRepository.findByCompleted(false).size();
+//        int completed = todoRepository.findByCompleted(true).size();
+//
+//        List<Integer> totalList = new ArrayList<>();
+//        totalList.add(total);
+//        totalList.add(active);
+//        totalList.add(completed);
+//
+//        return totalList;
+//    }
 
-    // 통계 기능. 시도한거
-    public List<Integer> Total(){
-        int total = todoRepository.findAll().size();
-        int active = todoRepository.findByCompleted(false).size();
-        int completed = todoRepository.findByCompleted(true).size();
-
-        List<Integer> totalList = new ArrayList<>();
-        totalList.add(total);
-        totalList.add(active);
-        totalList.add(completed);
-
-        return totalList;
+    private TodoDto toDto(TodoEntity entity){
+        TodoDto dto = new TodoDto();
+        dto.setId(entity.getId());
+        dto.setContent(entity.getContent());
+        dto.setTitle(entity.getTitle());
+        dto.setCompleted(entity.isCompleted());
+        return dto;
     }
 
 

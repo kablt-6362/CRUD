@@ -3,6 +3,7 @@ package com.example.todoapp.entity;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name="todos") //생성할 테이블 이름 설정 가능
 public class TodoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
